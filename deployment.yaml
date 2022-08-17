@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-app
+  labels:
+    app: api-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-app
+  template:
+    metadata:
+      labels:
+        app: api-app
+    spec:
+      containers:
+      - name: api-app
+        image: aathish001/devops_application:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: "1"
+        ports:
+        - containerPort: 3000
+        env:
+        - name: CONFIGURATION_OF_DBUSER
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: DB_USER
+        - name: CONFIGURATION_OF_DBPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: DB_PASSWORD
+        - name: CONFIGURATION_OF_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: DB_DATABASE
+        - name: CONFIGURATION_OF_DBHOST
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: DB_HOST
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-srv
+spec:
+  selector:
+    app: api-app
+  ports:
+  - port: 3000
+    targetPort: 3000
+
