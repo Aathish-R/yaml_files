@@ -72,7 +72,7 @@ spec:
     targetPort: 3000
     protocol: TCP
   externalTrafficPolicy: Local
-  type: LoadBalancer
+  type: NodePort
 
 
 
