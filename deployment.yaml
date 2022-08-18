@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-app
+  name: node-app
+  namespace: aathishtest1
   labels:
     app: api-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-app
+      app: node-app
   template:
     metadata:
       labels:
-        app: api-app
+        app: node-app
     spec:
       containers:
-      - name: api-app
-        image: aathish001/devops_application:latest
+      - name: node-app
+        image: aathish001/node-app:latest
         imagePullPolicy: Always
         resources:
           limits:
@@ -45,17 +46,32 @@ spec:
             secretKeyRef:
               name:  mysecret
               key: DB_HOST
+        - name: CONFIGURATION_OF_DBPORT
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: DB_PORT
+        - name: CONFIGURATION_OF_PORT
+          valueFrom:
+            secretKeyRef:
+              name:  mysecret
+              key: PORT
 
 --- 
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-srv
+  name: nodeapp-srv
 spec:
   selector:
-    app: api-app
+    app: node-app
   ports:
   - port: 3000
     targetPort: 3000
+    protocol: TCP
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+
+
 
