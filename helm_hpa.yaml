@@ -1,0 +1,15 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mynodea-pp-hpa
+  namespace: aathishtest1
+  annotations:
+    autoscaling.alpha.kubernetes.io/behavior: '{"ScaleUp":{"StabilizationWindowSeconds":0,"Policies":[{"Type":"Pods","Value":1,"PeriodSeconds":120},{"Type":"Percent","Value":10,"PeriodSeconds":120}]},"ScaleDown":{"StabilizationWindowSeconds":0,"Policies":[{"Type":"Pods","Value":1,"PeriodSeconds":120}]}}'
+spec:
+  maxReplicas: {{ .Values.hpa.maxReplicas }}
+  minReplicas: {{ .Values.hpa.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: node-app
+  targetCPUUtilizationPercentage: {{ .Values.hpa.targetCPUUtilizationPercentage }}
