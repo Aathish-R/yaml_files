@@ -4,7 +4,7 @@ metadata:
   name: node-app
   namespace: aathishtest1
   labels:
-    app: api-app
+    app: node-app
 spec:
   replicas: 1
   selector:
@@ -17,60 +17,57 @@ spec:
     spec:
       containers:
       - name: node-app
-        image: srivarshan/sag_task:1.0.0
+        image:  suryaprasaath/sag-app:1.0
         imagePullPolicy: Always
         resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1"
           limits:
-            memory: 1Gi
+            memory: "1Gi"
             cpu: "1"
         ports:
         - containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+            initialDeploySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
         env:
-        - name: CONFIGURATION_OF_DBUSER
+        - name: DB_USER
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: DB_USER
-        - name: CONFIGURATION_OF_DBPASSWORD
+        - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: DB_PASSWORD
-        - name: CONFIGURATION_OF_DATABASE
+        - name: DB_DATABASE
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: DB_DATABASE
-        - name: CONFIGURATION_OF_DBHOST
+        - name: DB_HOST
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: DB_HOST
-        - name: CONFIGURATION_OF_DBPORT
+        - name: DB_PORT
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: DB_PORT
-        - name: CONFIGURATION_OF_PORT
+        - name: PORT
           valueFrom:
             secretKeyRef:
               name:  mysecret
               key: PORT
-
---- 
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: nodeapp-srv
-  namespace: aathishtest1
-spec:
-  selector:
-    app: node-app
-  ports:
-  - port: 3000
-    targetPort: 3000
-  type: LoadBalancer
-
-
-
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
